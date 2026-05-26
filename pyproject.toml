@@ -4,9 +4,9 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tg-ws-proxy"
-dynamic=["version"]
+dynamic = ["version"]
 
-description = "Telegram Desktop WebSocket Bridge Proxy"
+description = "Telegram MTProto WebSocket Bridge Proxy (headless)"
 readme = "docs/README.md"
 requires-python = ">=3.8"
 
@@ -34,40 +34,23 @@ classifiers = [
   "Topic :: System :: Networking :: Firewalls",
 ]
 
-dependencies = [
-    "pyperclip==1.9.0",
+# proxy/_aes.py falls back to system libcrypto via ctypes if `cryptography`
+# is missing, so the package is technically dependency-free. Listed as an
+# optional extra for users on platforms where the wheel is available.
+dependencies = []
 
-    "psutil==5.9.8; platform_system == 'Windows' and python_version < '3.9'",
-    "cryptography==41.0.7; platform_system == 'Windows' and python_version < '3.9'",
-    "Pillow==10.4.0; platform_system == 'Windows' and python_version < '3.9'",
-
-    "psutil==7.0.0; platform_system != 'Windows' or python_version >= '3.9'",
-    "cryptography==46.0.5; platform_system != 'Windows' or python_version >= '3.9'",
-    "Pillow==12.1.1; (platform_system != 'Windows' or python_version >= '3.9') and platform_system != 'Darwin'",
-
-    "customtkinter==5.2.2; platform_system != 'Darwin'",
-    "pystray==0.19.5; platform_system != 'Darwin'",
-    "rumps==0.4.0; platform_system == 'Darwin'",
-    "Pillow==12.1.0; platform_system == 'Darwin'",
-]
+[project.optional-dependencies]
+crypto = ["cryptography>=41"]
 
 [project.scripts]
 tg-ws-proxy = "proxy.tg_ws_proxy:main"
-tg-ws-proxy-tray-win = "windows:main"
-tg-ws-proxy-tray-macos = "macos:main"
-tg-ws-proxy-tray-linux = "linux:main"
 
 [project.urls]
-Source = "https://github.com/Flowseal/tg-ws-proxy"
-Issues = "https://github.com/Flowseal/tg-ws-proxy/issues"
+Source = "https://github.com/k1zn/tg-ws-proxy"
+Issues = "https://github.com/k1zn/tg-ws-proxy/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["proxy", "ui", "utils"]
-
-[tool.hatch.build.force-include]
-"windows.py" = "windows.py"
-"macos.py" = "macos.py"
-"linux.py" = "linux.py"
+packages = ["proxy"]
 
 [tool.hatch.version]
 path = "proxy/__init__.py"

@@ -1,137 +1,65 @@
-<div align="center">
-	<br />
-	<p>
-		<img width="1729" height="910" alt="tgwsproxy" src="./images/workflow.png" />
-	</p>
-</div>
+# tg-ws-proxy (Entware fork)
 
-##
+Если хотите поддержать оригинального автора — его контакты в [апстрим-репозитории](https://github.com/Flowseal/tg-ws-proxy).
 
-> [!TIP]
->
-> ### [🎉 Поддержать меня](./Funding.md)
->
-> **USDT (TRC20)**: `TXPnKs2Ww1RD8JN6nChFUVmi5r2hqrWjuu`  
-> **BTC**: `bc1qr8vd6jelkyyry3m4mq6z5txdx4pl856fu6ss0w`  
-> **ETH**: `0x1417878fdc5047E670a77748B34819b9A49C72F1`  
-> **Другие монеты**: https://nowpayments.io/donation/flowseal
+Данный форк позволяет запустить локальный tg-ws-proxy на вашем роутере, используя Entware.
 
-> [!CAUTION]
->
-> ### Реакция антивирусов
->
-> Антивирусы часто ошибочно помечают приложение как вирус из-за упаковщика.  
-> Если вы не можете скачать из-за блокировки антивирусом, то:
->
-> 1) **Попробуйте скачать версию для Windows 7 (по функциональности она не отличается)**
-> 2) Отключите антивирус на время скачивания, добавьте файл в исключения и включите обратно  
->
-> Всегда проверяйте, что скачиваете из интернета, тем более из непроверенных источников. Всегда лучше смотреть на детекты широко известных антивирусов на VirusTotal
+## Подготовка роутера
 
-# TG WS Proxy
+Разверните Entware на USB-флешке — см. официальный гайд Keenetic:
+**[Установка репозитория Entware на USB-накопитель](https://support.keenetic.ru/ultra/kn-1811/ru/20980.html)**.
 
-**Локальный MTProto-прокси** для Telegram Desktop, который **ускоряет работу Telegram**, перенаправляя трафик через WebSocket-соединения. Данные передаются в том же зашифрованном виде, а для работы не нужны сторонние серверы.
+## Установка
 
-<picture>
-  <source srcset="./images/preview-dark.png" media="(prefers-color-scheme: dark)">
-  <img src="./images/preview-white.png">
-</picture>
+```sh
+# с компа — залить исходники на роутер
+scp -O -r tg-ws-proxy root@192.168.1.1:/tmp/
 
-## Навигация
-
-- **🚀 Быстрый старт**
-  - **[Windows](./README.windows.md)**
-  - **[macOS](./README.macos.md)**
-  - **[Linux](./README.linux.md)**
-  - **[Docker](./README.docker.md)**
-  - **[Entware (Keenetic / OpenWrt routers)](./README.entware.md)**
-- [Настройка Cloudflare Worker'а (бесплатный аналог CF-прокси)](./CfWorker.md)
-- [Настройка Cloudflare-домена (CF-прокси)](./CfProxy.md)
-- [Fake TLS + upstream в Nginx](./FakeTlsNginx.md)
-- [Файлы конфигурации Tray-приложения](./TrayConfig.md)
-- [Установка из исходников](./BuildFromSource.md)
-- [Руководство для контрибьюторов](../CONTRIBUTING.md)
-
-## Windows: быстрый вход
-
-Перейдите на [страницу релизов](https://github.com/Flowseal/tg-ws-proxy/releases) и скачайте:
-
-- `TgWsProxy_windows.exe` (Windows 10+)
-- `TgWsProxy_windows_7_64bit.exe` (Windows 7 x64)
-- `TgWsProxy_windows_7_32bit.exe` (Windows 7 x32)
-
-При первом запуске откроется окно с инструкцией по подключению Telegram Desktop. **Приложение сворачивается в системный трей.**
-
-### Меню трея
-
-- **Открыть в Telegram** — автоматически настроить прокси через ссылку `tg://proxy`
-- **Скопировать ссылку** — скопировать ссылку для подключения
-- **Перезапустить прокси** — перезапуск без выхода из приложения
-- **Настройки...** — GUI-редактор конфигурации (версия приложения, опциональная проверка обновлений с GitHub)
-- **Открыть логи** — открыть файл логов
-- **Выход** — остановить прокси и закрыть приложение
-
-### Настройка Telegram Desktop
-
-**Автоматическая настройка**
-
-Щелкните правой кнопкой мыши по значку в трее и выберите **«Открыть в Telegram»**.
-
-Если не сработало (Telegram не открылся с подключением), выполните шаги ниже:
-
-1. Щелкните правой кнопкой мыши по значку в трее и выберите **«Скопировать ссылку»**
-2. Отправьте ссылку в «Избранное» в Telegram и нажмите по ней левой кнопкой мыши
-3. Подключитесь
-
-**Ручная настройка**
-
-1. Telegram → **Настройки** → **Продвинутые настройки** → **Тип подключения** → **Прокси**
-2. Добавьте прокси:
-   - **Тип:** MTProto
-   - **Сервер:** `127.0.0.1` (или переопределенный вами)
-   - **Порт:** `1443` (или переопределенный вами)
-   - **Secret:** из настроек или логов
-
-## Как это работает
-
-```
-Telegram Desktop → MTProto Proxy (127.0.0.1:1443) → WebSocket → Telegram DC
+# на роутере
+ssh root@192.168.1.1
+cd /tmp/tg-ws-proxy
+sh entware/install.sh
 ```
 
-1. Приложение поднимает MTProto прокси на `127.0.0.1:1443`
-2. Перехватывает подключения к IP-адресам Telegram
-3. Извлекает DC ID из MTProto obfuscation init-пакета
-4. Устанавливает WebSocket-соединение (TLS) к соответствующему DC через домены Telegram
-5. Если WS недоступен (302 redirect) — автоматически переключается на CfProxy / прямое TCP-соединение
+## Настройка
 
-> [!IMPORTANT] 
-> ### Не грузит фото/видео?
-> **Удалите в настройках прокси в DC → IP всё, кроме `4:149.154.167.220`**  
-> **Если это не помогло, полностью очистите это поле**  
-> Подобная проблема встречается на аккаунтах без Premium  
-> Если это не помогло, настройте собственный домен по инструкции: [CfProxy.md](./CfProxy.md)
+```sh
+nano /opt/etc/tg-ws-proxy.conf
+```
 
-## Автоматическая сборка
+```
+HOST=0.0.0.0
+PORT=1443
+SECRET=
+DC_IPS="2:149.154.167.220 4:149.154.167.220"
+POOL_SIZE=1
+FAKE_TLS_DOMAIN=
+EXTRA_ARGS=
+```
 
-Проект содержит спецификации PyInstaller ([`packaging/windows.spec`](../packaging/windows.spec), [`packaging/macos.spec`](../packaging/macos.spec), [`packaging/linux.spec`](../packaging/linux.spec)) и GitHub Actions workflow ([`.github/workflows/build.yml`](../.github/workflows/build.yml)) для автоматической сборки.
+`SECRET` пустой = автогенерация при первом запуске.
 
-Минимально поддерживаемые версии ОС для текущих бинарных сборок:
+## Запуск
 
-- Windows 10+ для `TgWsProxy_windows.exe`
-- Windows 7 (x64) для `TgWsProxy_windows_7_64bit.exe`
-- Windows 7 (x32) для `TgWsProxy_windows_7_32bit.exe`
-- Intel macOS 10.15+
-- Apple Silicon macOS 11.0+
-- Linux x86_64 (требуется AppIndicator для системного трея)
+```sh
+/opt/etc/init.d/S99tgwsproxy start
+tail -f /opt/var/log/tg-ws-proxy.log
+```
 
-## Контрибьюторы
+В логе появится ссылка `tg://proxy?server=...&port=...&secret=...` — откройте её в Telegram.
 
-Спасибо всем, кто помогает развивать проект ❤️
+Скрипт стартует автоматически после ребута роутера.
 
-<a href="https://github.com/Flowseal/tg-ws-proxy/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Flowseal/tg-ws-proxy" />
-</a>
+## Управление
 
-## Лицензия
+```sh
+/opt/etc/init.d/S99tgwsproxy start|stop|restart|check
+```
 
-[MIT License](../LICENSE)
+## Удаление
+
+```sh
+/opt/etc/init.d/S99tgwsproxy stop
+rm -f /opt/etc/init.d/S99tgwsproxy /opt/etc/tg-ws-proxy.conf
+rm -rf /opt/tg-ws-proxy /opt/var/log/tg-ws-proxy.log*
+```

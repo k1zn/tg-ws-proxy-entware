@@ -26,6 +26,10 @@ sh entware/install.sh
 ```sh
 nano /opt/etc/tg-ws-proxy.conf
 ```
+или
+```sh
+vi /opt/etc/tg-ws-proxy.conf
+```
 
 ```
 HOST=0.0.0.0

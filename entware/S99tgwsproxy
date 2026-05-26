@@ -1,0 +1,49 @@
+#!/bin/sh
+# Entware init.d script for tg-ws-proxy.
+# Coexists with zapret: zapret hooks NFQUEUE on outbound 443/80, we are a
+# separate userspace listener on PORT below. No iptables changes here on
+# purpose — let zapret own the firewall.
+
+ENABLED=yes
+PROCS=python3
+ARGS=""           # set via wrapper below
+PREARGS=""
+DESC=tg-ws-proxy
+PATH=/opt/bin:/opt/sbin:/usr/bin:/bin
+
+WORKDIR=/opt/tg-ws-proxy
+CONFFILE=/opt/etc/tg-ws-proxy.conf
+LOGFILE=/opt/var/log/tg-ws-proxy.log
+
+# defaults; override in /opt/etc/tg-ws-proxy.conf
+HOST=0.0.0.0
+PORT=1443
+SECRET=""
+DC_IPS="2:149.154.167.220 4:149.154.167.220"
+POOL_SIZE=1
+FAKE_TLS_DOMAIN=""
+EXTRA_ARGS=""
+
+[ -r "$CONFFILE" ] && . "$CONFFILE"
+
+if [ -z "$SECRET" ]; then
+    SECRET=$(hexdump -n 16 -e '16/1 "%02x"' /dev/urandom)
+    echo "SECRET=$SECRET" >> "$CONFFILE"
+fi
+
+DC_FLAGS=""
+for dc in $DC_IPS; do
+    DC_FLAGS="$DC_FLAGS --dc-ip $dc"
+done
+
+FTLS_FLAG=""
+[ -n "$FAKE_TLS_DOMAIN" ] && FTLS_FLAG="--fake-tls-domain $FAKE_TLS_DOMAIN"
+
+ARGS="-m proxy.tg_ws_proxy --host $HOST --port $PORT --secret $SECRET \
+      --pool-size $POOL_SIZE --log-file $LOGFILE --log-max-mb 2 --log-backups 1 \
+      $DC_FLAGS $FTLS_FLAG $EXTRA_ARGS"
+
+mkdir -p "$(dirname "$LOGFILE")"
+cd "$WORKDIR" || exit 1
+
+. /opt/etc/init.d/rc.func

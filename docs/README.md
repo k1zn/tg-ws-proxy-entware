@@ -44,6 +44,7 @@
   - **[macOS](./README.macos.md)**
   - **[Linux](./README.linux.md)**
   - **[Docker](./README.docker.md)**
+  - **[Entware (Keenetic / OpenWrt routers)](./README.entware.md)**
 - [Настройка Cloudflare Worker'а (бесплатный аналог CF-прокси)](./CfWorker.md)
 - [Настройка Cloudflare-домена (CF-прокси)](./CfProxy.md)
 - [Fake TLS + upstream в Nginx](./FakeTlsNginx.md)

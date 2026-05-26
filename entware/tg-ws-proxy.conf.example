@@ -1,0 +1,16 @@
+# /opt/etc/tg-ws-proxy.conf — sourced by /opt/etc/init.d/S99tgwsproxy
+# All values optional. SECRET is auto-generated on first run if empty.
+
+HOST=0.0.0.0
+PORT=1443
+SECRET=
+DC_IPS="2:149.154.167.220 4:149.154.167.220"
+
+# WS connection pool per DC. 1 is plenty on a router. Set to 0 to disable.
+POOL_SIZE=1
+
+# Optional Fake-TLS masking (ee-secret). Example: FAKE_TLS_DOMAIN=www.cloudflare.com
+FAKE_TLS_DOMAIN=
+
+# Anything extra to pass to proxy.tg_ws_proxy, e.g. --no-cfproxy or -v
+EXTRA_ARGS=

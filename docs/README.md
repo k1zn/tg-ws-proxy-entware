@@ -4,6 +4,17 @@
 
 Данный форк позволяет запустить локальный tg-ws-proxy на вашем роутере, используя Entware.
 
+## Оглавление
+
+- [Подготовка роутера](#подготовка-роутера)
+- [Установка](#установка)
+- [Настройка](#настройка)
+- [Запуск](#запуск)
+- [Управление](#управление)
+- [Удаление](#удаление)
+- [Свой Cloudflare-проксированный домен (`--cfproxy-domain`)](#свой-cloudflare-проксированный-домен)
+- [Cloudflare Worker (`--cfproxy-worker-domain`)](#cloudflare-worker)
+
 ## Подготовка роутера
 
 Разверните Entware на USB-флешке — см. официальный гайд Keenetic:
@@ -67,3 +78,29 @@ tail -f /opt/var/log/tg-ws-proxy.log
 rm -f /opt/etc/init.d/S99tgwsproxy /opt/etc/tg-ws-proxy.conf
 rm -rf /opt/tg-ws-proxy /opt/var/log/tg-ws-proxy.log*
 ```
+
+<a id="свой-cloudflare-проксированный-домен"></a>
+## Свой Cloudflare-проксированный домен (`--cfproxy-domain`)
+
+Как настроить сам домен — см. [апстрим-репозиторий](https://github.com/Flowseal/tg-ws-proxy). Готовый домен указывается через `EXTRA_ARGS` в `/opt/etc/tg-ws-proxy.conf`:
+
+```sh
+EXTRA_ARGS="--cfproxy-domain my.example.com"
+```
+
+<a id="cloudflare-worker"></a>
+## Cloudflare Worker (`--cfproxy-worker-domain`)
+
+Как создать Worker — см. [docs/CfWorker.md](CfWorker.md) и [апстрим-репозиторий](https://github.com/Flowseal/tg-ws-proxy). Полученный домен указывается через `EXTRA_ARGS`:
+
+```sh
+EXTRA_ARGS="--cfproxy-worker-domain random-symbols-1234.username.workers.dev"
+```
+
+Можно комбинировать:
+
+```sh
+EXTRA_ARGS="--cfproxy-domain my.example.com --cfproxy-worker-domain random-symbols-1234.username.workers.dev"
+```
+
+После правки — `/opt/etc/init.d/S99tgwsproxy restart`.
